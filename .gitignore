@@ -1,0 +1,5 @@
+.idea
+.venv
+best_model
+data/Raw_Data_JSON
+data/*.zip
