@@ -25,4 +25,4 @@ class Preprocess(object):
     def postprocess(self, data: Any, collect_custom_statistics_fn=None) -> dict:
         # post process the data returned from the model inference engine
         # data is the return value from model.predict we will put is inside a return value as Y
-        return dict(y=data.tolist() if isinstance(data, np.ndarray) else data)
+        return dict(y=round(data[0]))
