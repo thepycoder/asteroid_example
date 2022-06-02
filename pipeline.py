@@ -49,11 +49,13 @@ pipe = PipelineController(
 
 pipe.set_default_execution_queue('victor-pipelines')
 pipe.add_parameter('training_seeds', [42, 420, 500])
+pipe.add_parameter('query', 'SELECT * FROM df WHERE year <= 2021')
 
 pipe.add_step(
     name='get_data',
     base_task_project=global_config.PROJECT_NAME,
-    base_task_name='get data'
+    base_task_name='get data',
+    parameter_override={'General/query': '${pipeline.query}'}
 )
 pipe.add_step(
     name='preprocess_data',
