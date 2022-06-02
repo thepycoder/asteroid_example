@@ -16,7 +16,7 @@ def query_database_to_df(query='SELECT * FROM df'):
     df['year'] = 2000 * [2021] + (len(df) - 2000) * [2022]
 
     # Query the df base on the argument
-    sqldf(query, locals())
+    df = sqldf(query, locals())
 
     # Save resulting DF to disk so it can be added to a clearml dataset as a file
     df.to_csv(out_path)

@@ -20,14 +20,23 @@ def post_execute_callback_example(a_pipeline, a_node):
 
 
 def compare_metrics_and_tag_best(**kwargs):
+    from clearml import OutputModel
+    # Compare accuracies from all incoming nodes
     current_best = ('', 0)
     for node_name, training_task_id in kwargs.items():
         accuracy = Task.get_task(task_id=training_task_id).artifacts['accuracy'].get()
         print(node_name, accuracy)
         if accuracy > current_best[1]:
-            current_best = (training_task_id, accuracy)
+            current_best = (node_name, accuracy)
             print(f"New current best model: {node_name}")
-    Task.get_task(task_id=current_best[0]).add_tags(['best_of_run'])
+
+    print(f"Final best model made by step: {current_best[0]}")
+    # # Get the best node and tag it as being best
+    # best_task = Task.get_task(task_id=current_best[0])
+    # best_task.add_tags(['best_of_run'])
+    # # Also upload the best model to the pipeline as a whole, so it's easier to get to from the UI
+    # # task will be injected once this function runs as part of the pipeline
+    # OutputModel(task=task, base_model_id=best_task.models['output'][0].id)
 
 
 # Connecting ClearML with the current pipeline,
@@ -74,7 +83,8 @@ pipe.add_function_step(
     name='tag_best_model',
     parents=training_nodes,
     function=compare_metrics_and_tag_best,
-    function_kwargs={node_name: '${%s.id}' % node_name for node_name in training_nodes}
+    function_kwargs={node_name: '${%s.id}' % node_name for node_name in training_nodes},
+    monitor_models=['*']
 )
 
 

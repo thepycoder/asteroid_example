@@ -14,14 +14,14 @@ task = Task.init(
     reuse_last_task_id=False
 )
 
+config = {
+    'query': 'SELECT * FROM df WHERE year <= 2021'
+}
+task.connect(config)
 
-def log_dataset_statistics(dataset, local_path):
-    df = pd.read_csv(local_path)
-    dataset.get_logger().report_table(title='Asteroid Data', series='head', table_plot=df.head())
 
-
-# TODO: change this to StorageManager or similar using database
-df, data_path = database.query_database_to_df('SELECT * FROM df WHERE year <= 2021')
+# Get the data and a path to the file
+df, data_path = database.query_database_to_df(query=config['query'])
 
 # Create a ClearML dataset
 dataset = Dataset.create(
@@ -31,6 +31,6 @@ dataset = Dataset.create(
 # Add the local files we downloaded earlier
 dataset.add_files(data_path)
 # Let's add some cool graphs as statistics in the plots section!
-log_dataset_statistics(dataset, data_path)
+dataset.get_logger().report_table(title='Asteroid Data', series='head', table_plot=df.head())
 # Finalize and upload the data and labels of the dataset
 dataset.finalize(auto_upload=True)
