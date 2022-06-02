@@ -21,7 +21,7 @@ def log_dataset_statistics(dataset, local_path):
 
 
 # TODO: change this to StorageManager or similar using database
-df, data_path = database.query_database_to_df('')
+df, data_path = database.query_database_to_df('SELECT * FROM df WHERE year <= 2021')
 
 # Create a ClearML dataset
 dataset = Dataset.create(

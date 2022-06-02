@@ -6,3 +6,5 @@ data/*.zip
 *.excalidraw
 *.png
 **/__pycache__/**
+**/X.csv
+**/y.csv
