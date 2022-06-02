@@ -3,3 +3,6 @@
 best_model
 data/Raw_Data_JSON
 data/*.zip
+*.excalidraw
+*.png
+**/__pycache__/**

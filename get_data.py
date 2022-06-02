@@ -4,6 +4,7 @@ import pandas as pd
 from clearml import Task, Dataset, StorageManager
 
 import global_config
+from data import database
 
 
 task = Task.init(
@@ -20,7 +21,7 @@ def log_dataset_statistics(dataset, local_path):
 
 
 # TODO: change this to StorageManager or similar using database
-data_path = Path('data/nasa.csv')
+df, data_path = database.query_database_to_df('')
 
 # Create a ClearML dataset
 dataset = Dataset.create(
