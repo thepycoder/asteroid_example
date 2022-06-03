@@ -1,3 +1,4 @@
+import os.path
 from pathlib import Path
 
 import pandas as pd
@@ -15,6 +16,8 @@ task = Task.init(
 
 # Set some parameters
 preprocessed_data_folder = Path('data/preprocessed_data')
+if not os.path.exists(preprocessed_data_folder):
+    os.makedirs(preprocessed_data_folder)
 
 # Get the dataset
 dataset = Dataset.get(
@@ -22,6 +25,7 @@ dataset = Dataset.get(
     dataset_name='raw_asteroid_dataset',
 )
 local_folder = dataset.get_local_copy()
+print(f"Using dataset ID: {dataset.id}")
 
 # Clean up the data a little bit
 df = pd.read_csv((Path(local_folder) / 'nasa.csv'))

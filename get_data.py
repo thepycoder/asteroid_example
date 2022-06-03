@@ -34,3 +34,5 @@ dataset.add_files(data_path)
 dataset.get_logger().report_table(title='Asteroid Data', series='head', table_plot=df.head())
 # Finalize and upload the data and labels of the dataset
 dataset.finalize(auto_upload=True)
+
+print(f"Created dataset with ID: {dataset.id}")

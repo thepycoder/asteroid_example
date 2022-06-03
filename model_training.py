@@ -65,5 +65,10 @@ preds = bst.predict(dtest)
 predictions = [round(value) for value in preds]
 accuracy = accuracy_score(y_test['Hazardous'].to_list(), predictions)
 # Save the actual accuracy as an artifact so we can get it as part of the pipeline
-task.upload_artifact(name='accuracy', artifact_object=accuracy)
+task.get_logger().report_scalar(
+    title='Accuracy',
+    series='Accuracy',
+    value=accuracy,
+    iteration=0
+)
 print("Done")

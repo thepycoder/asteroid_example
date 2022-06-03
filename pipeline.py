@@ -32,7 +32,8 @@ def compare_metrics_and_tag_best(**kwargs):
 
     print(f"Final best model made by step: {current_best[0]}")
     # # Get the best node and tag it as being best
-    # best_task = Task.get_task(task_id=current_best[0])
+    best_task = Task.get_task(task_id=current_best[0])
+    OutputModel(name="best", base_model_id=best_task.models['output'][0].id)
     # best_task.add_tags(['best_of_run'])
     # # Also upload the best model to the pipeline as a whole, so it's easier to get to from the UI
     # # task will be injected once this function runs as part of the pipeline
@@ -47,7 +48,7 @@ pipe = PipelineController(
     version='0.0.1'
 )
 
-pipe.set_default_execution_queue('victor-pipelines')
+pipe.set_default_execution_queue('default')
 pipe.add_parameter('training_seeds', [42, 420, 500])
 pipe.add_parameter('query', 'SELECT * FROM df WHERE year <= 2021')
 
@@ -81,18 +82,25 @@ for i, random_state in enumerate(pipe.get_parameters()['training_seeds']):
                             'General/random_state': random_state}
     )
 
-pipe.add_function_step(
+# pipe.add_function_step(
+#     name='tag_best_model',
+#     parents=training_nodes,
+#     function=compare_metrics_and_tag_best,
+#     function_kwargs={node_name: '${%s.id}' % node_name for node_name in training_nodes},
+#     monitor_models=["best"]
+# )
+pipe.add_step(
     name='tag_best_model',
     parents=training_nodes,
-    function=compare_metrics_and_tag_best,
-    function_kwargs={node_name: '${%s.id}' % node_name for node_name in training_nodes},
-    monitor_models=['*']
+    base_task_project=global_config.PROJECT_NAME,
+    base_task_name='check models',
+    parameter_override={'General/nodes': {node_name: '${%s.id}' % node_name for node_name in training_nodes}}
 )
 
 
 # for debugging purposes use local jobs
-pipe.start_locally(run_pipeline_steps_locally=True)
+# pipe.start_locally(run_pipeline_steps_locally=True)
 # Starting the pipeline (in the background)
-# pipe.start()
+pipe.start()
 
 print('done')
