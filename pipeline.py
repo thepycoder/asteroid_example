@@ -3,7 +3,7 @@ from clearml.automation import PipelineController
 
 import global_config
 
-Task.debug_simulate_remote_task(task_id='464dc410c4d749cfb3e04cf3e9a222d6')
+# Task.debug_simulate_remote_task(task_id='07839552876c4093aa48a2d6fca00792')
 
 
 def pre_execute_callback_example(a_pipeline, a_node, current_param_override):
@@ -21,7 +21,7 @@ def post_execute_callback_example(a_pipeline, a_node):
     return
 
 
-def compare_metrics_and_tag_best(**kwargs):
+def compare_metrics_and_publish_best(**kwargs):
     from clearml import OutputModel
     # Compare accuracies from all incoming nodes
     current_best = ('', 0)
@@ -35,7 +35,7 @@ def compare_metrics_and_tag_best(**kwargs):
     print(f"Final best model made by step: {current_best[0]}")
     # # Get the best node and tag it as being best
     best_task = Task.get_task(task_id=current_best[0])
-    OutputModel(name="best", base_model_id=best_task.models['output'][0].id)
+    OutputModel(name="best_pipeline_model", base_model_id=best_task.models['output'][0].id)
     # best_task.add_tags(['best_of_run'])
     # # Also upload the best model to the pipeline as a whole, so it's easier to get to from the UI
     # # task will be injected once this function runs as part of the pipeline
@@ -58,8 +58,7 @@ pipe.add_step(
     name='get_data',
     base_task_project=global_config.PROJECT_NAME,
     base_task_name='get data',
-    parameter_override={'General/query': '${pipeline.query}'},
-    cache_executed_step=True
+    parameter_override={'General/query': '${pipeline.query}'}
 )
 pipe.add_step(
     name='preprocess_data',
@@ -67,8 +66,7 @@ pipe.add_step(
     base_task_project=global_config.PROJECT_NAME,
     base_task_name='preprocess data',
     pre_execute_callback=pre_execute_callback_example,
-    post_execute_callback=post_execute_callback_example,
-    cache_executed_step=True
+    post_execute_callback=post_execute_callback_example
 )
 training_nodes = []
 # Seeds should be pipeline arguments
@@ -83,16 +81,15 @@ for i, random_state in enumerate(pipe.get_parameters()['training_seeds']):
         base_task_name='model training',
         parameter_override={'General/num_boost_round': 250,
                             'General/test_size': 0.5,
-                            'General/random_state': random_state},
-        cache_executed_step=True
+                            'General/random_state': random_state}
     )
 
 pipe.add_function_step(
     name='tag_best_model',
     parents=training_nodes,
-    function=compare_metrics_and_tag_best,
+    function=compare_metrics_and_publish_best,
     function_kwargs={node_name: '${%s.id}' % node_name for node_name in training_nodes},
-    monitor_models=["best"]
+    monitor_models=["best_pipeline_model"]
 )
 # pipe.add_step(
 #     name='tag_best_model',
@@ -106,9 +103,8 @@ pipe.add_function_step(
 
 # for debugging purposes use local jobs
 # pipe.start_locally(run_pipeline_steps_locally=True)
+# pipe.start_locally()
 # Starting the pipeline (in the background)
-pipe.start(
-    queue=None
-)
+pipe.start()
 
 print('done')

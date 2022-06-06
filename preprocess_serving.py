@@ -11,7 +11,7 @@ class Preprocess(object):
         # set internal state, this will be called only once. (i.e. not per request)
         pass
 
-    def preprocess(self, body: dict, collect_custom_statistics_fn=None) -> Any:
+    def preprocess(self, body: dict, state: dict, collect_custom_statistics_fn=None) -> Any:
         df = pd.DataFrame(columns=body.keys())
         df.loc[0] = body.values()
         df['avg_dia'] = df[['Est Dia in KM(min)', 'Est Dia in KM(max)']].mean(axis=1)
@@ -22,7 +22,7 @@ class Preprocess(object):
         # we expect to get four valid numbers on the dict: x0, x1, x2, x3
         return xgb.DMatrix(X)
 
-    def postprocess(self, data: Any, collect_custom_statistics_fn=None) -> dict:
+    def postprocess(self, data: Any, state: dict, collect_custom_statistics_fn=None) -> dict:
         # post process the data returned from the model inference engine
         # data is the return value from model.predict we will put is inside a return value as Y
-        return dict(y=round(data[0]))
+        return dict(y=round(data[0]), y_raw=float(data[0]))

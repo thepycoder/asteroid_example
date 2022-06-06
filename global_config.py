@@ -1,1 +1,1 @@
-PROJECT_NAME = 'Asteroid Hazard Classification'
+PROJECT_NAME = 'Asteroid Demo'

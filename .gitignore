@@ -1,6 +1,7 @@
 .idea
 .venv
 best_model
+best_model_test
 data/Raw_Data_JSON
 data/*.zip
 *.excalidraw
