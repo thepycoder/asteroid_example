@@ -5,7 +5,6 @@ best_model_test
 data/Raw_Data_JSON
 data/*.zip
 *.excalidraw
-*.png
 **/__pycache__/**
 X.csv
 y.csv

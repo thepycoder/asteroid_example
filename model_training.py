@@ -66,9 +66,15 @@ recall = recall_score(y_test['Hazardous'].to_list(), predictions)
 print(f"Model trained with accuracy: {accuracy} and recall: {recall}")
 # Save the actual accuracy as an artifact so we can get it as part of the pipeline
 task.get_logger().report_scalar(
-    title='Accuracy',
+    title='Performance',
     series='Accuracy',
     value=accuracy,
+    iteration=0
+)
+task.get_logger().report_scalar(
+    title='Performance',
+    series='Recall',
+    value=recall,
     iteration=0
 )
 print("Done")

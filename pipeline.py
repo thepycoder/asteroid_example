@@ -29,7 +29,7 @@ def compare_metrics_and_publish_best(**kwargs):
     for node_name, training_task_id in kwargs.items():
         # Get the original task based on the ID we got from the pipeline
         task = Task.get_task(task_id=training_task_id)
-        accuracy = task.get_reported_scalars()['Accuracy']['Accuracy']['y'][0]
+        accuracy = task.get_reported_scalars()['Performance']['Accuracy']['y'][0]
         model_id = task.get_models()['output'][0].id
         # Check if accuracy is better than current best, if so, overwrite current best
         if accuracy > current_best.get('accuracy', 0):

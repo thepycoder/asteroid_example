@@ -25,7 +25,6 @@ dataset = Dataset.get(
 )
 local_folder = dataset.get_local_copy()
 print(f"Using dataset ID: {dataset.id}")
-local_folder = '/tmp'
 
 # Clean up the data a little bit
 df = pd.read_csv((Path(local_folder) / 'nasa.csv'))
