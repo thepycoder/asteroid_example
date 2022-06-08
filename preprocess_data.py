@@ -2,10 +2,9 @@ import os.path
 from pathlib import Path
 
 import pandas as pd
-from clearml import Task, Dataset
+from clearml import Dataset, Task
 
 import global_config
-
 
 task = Task.init(
     project_name=global_config.PROJECT_NAME,
@@ -14,7 +13,7 @@ task = Task.init(
     reuse_last_task_id=False
 )
 
-# Set some parameters
+# Create the folder we'll output the preprocessed data into
 preprocessed_data_folder = Path('data/preprocessed_data')
 if not os.path.exists(preprocessed_data_folder):
     os.makedirs(preprocessed_data_folder)
@@ -25,6 +24,7 @@ dataset = Dataset.get(
     dataset_name='raw_asteroid_dataset',
 )
 local_folder = dataset.get_local_copy()
+# local_folder = 'data'
 print(f"Using dataset ID: {dataset.id}")
 
 # Clean up the data a little bit
