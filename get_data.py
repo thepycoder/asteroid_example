@@ -19,6 +19,8 @@ task.connect(config)
 
 # Get the data and a path to the file
 df, data_path = database.query_database_to_df(query=config['query'])
+print(f"Dataset downloaded to: {data_path}")
+print(df.head())
 
 # Create a ClearML dataset
 dataset = Dataset.create(
