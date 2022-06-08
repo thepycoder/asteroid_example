@@ -1,9 +1,7 @@
-from clearml import Task, PipelineDecorator
+from clearml import Task
 from clearml.automation import PipelineController
 
 import global_config
-
-# Task.debug_simulate_remote_task(task_id='07839552876c4093aa48a2d6fca00792')
 
 
 def pre_execute_callback_example(a_pipeline, a_node, current_param_override):
@@ -36,16 +34,12 @@ def compare_metrics_and_publish_best(**kwargs):
     # # Get the best node and tag it as being best
     best_task = Task.get_task(task_id=current_best[0])
     OutputModel(name="best_pipeline_model", base_model_id=best_task.models['output'][0].id)
-    # best_task.add_tags(['best_of_run'])
-    # # Also upload the best model to the pipeline as a whole, so it's easier to get to from the UI
-    # # task will be injected once this function runs as part of the pipeline
-    # OutputModel(task=task, base_model_id=best_task.models['output'][0].id)
 
 
 # Connecting ClearML with the current pipeline,
 # from here on everything is logged automatically
 pipe = PipelineController(
-    name='Workflow Example - Controller Task',
+    name='Asteroid Pipeline',
     project=global_config.PROJECT_NAME,
     version='0.0.1'
 )
@@ -91,19 +85,10 @@ pipe.add_function_step(
     function_kwargs={node_name: '${%s.id}' % node_name for node_name in training_nodes},
     monitor_models=["best_pipeline_model"]
 )
-# pipe.add_step(
-#     name='tag_best_model',
-#     parents=training_nodes,
-#     base_task_project=global_config.PROJECT_NAME,
-#     base_task_name='check models',
-#     parameter_override={'General/nodes': [(node_name, '${%s.id}' % node_name) for node_name in training_nodes]},
-#     monitor_models=['best_pipeline_model']
-# )
 
 
 # for debugging purposes use local jobs
 # pipe.start_locally(run_pipeline_steps_locally=True)
-# pipe.start_locally()
 # Starting the pipeline (in the background)
 pipe.start()
 

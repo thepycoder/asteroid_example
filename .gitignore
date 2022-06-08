@@ -9,3 +9,5 @@ data/*.zip
 **/__pycache__/**
 X.csv
 y.csv
+data/synthetic_drift.csv
+data/synthetic.csv
