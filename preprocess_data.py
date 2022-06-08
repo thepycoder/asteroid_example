@@ -14,7 +14,7 @@ task = Task.init(
 )
 
 # Create the folder we'll output the preprocessed data into
-preprocessed_data_folder = Path('data/preprocessed_data')
+preprocessed_data_folder = Path('/tmp')
 if not os.path.exists(preprocessed_data_folder):
     os.makedirs(preprocessed_data_folder)
 
@@ -24,8 +24,8 @@ dataset = Dataset.get(
     dataset_name='raw_asteroid_dataset',
 )
 local_folder = dataset.get_local_copy()
-# local_folder = 'data'
 print(f"Using dataset ID: {dataset.id}")
+local_folder = '/tmp'
 
 # Clean up the data a little bit
 df = pd.read_csv((Path(local_folder) / 'nasa.csv'))
@@ -35,9 +35,13 @@ X = df[['Absolute Magnitude', 'avg_dia', 'Relative Velocity km per hr', 'Miss Di
         'Inclination', 'Asc Node Longitude', 'Orbital Period', 'Perihelion Distance', 'Perihelion Arg',
         'Aphelion Dist', 'Perihelion Time', 'Mean Anomaly', 'Mean Motion']]
 X.to_csv(path_or_buf=preprocessed_data_folder / 'X.csv')
+print(f"Preprocessed data X")
+print(X.head())
 
 y = pd.DataFrame(df['Hazardous'].astype(int))
 y.to_csv(path_or_buf=preprocessed_data_folder / 'y.csv')
+print(f"Preprocessed data y")
+print(y.head())
 
 # Create a new version of the dataset, which is cleaned up
 new_dataset = Dataset.create(
