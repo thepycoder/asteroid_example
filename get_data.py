@@ -1,7 +1,4 @@
-from pathlib import Path
-
-import pandas as pd
-from clearml import Task, Dataset, StorageManager
+from clearml import Task, Dataset
 
 import global_config
 from data import database

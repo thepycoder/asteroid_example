@@ -1,15 +1,12 @@
 from pathlib import Path
 
+import matplotlib.pyplot as plt
 import pandas as pd
 import xgboost as xgb
-from sklearn.metrics import accuracy_score
-from xgboost import plot_importance
+from clearml import Dataset, Task
+from sklearn.metrics import accuracy_score, recall_score
 from sklearn.model_selection import train_test_split
-import matplotlib.pyplot as plt
-import pickle
-from clearml import Task, Dataset
-import argparse
-import time
+from xgboost import plot_importance
 
 # Connecting ClearML with the current process,
 # from here on everything is logged automatically
@@ -40,6 +37,7 @@ local_path = Dataset.get(
     dataset_project=global_config.PROJECT_NAME
 ).get_local_copy()
 local_path = Path(local_path)
+# local_path = Path('data/preprocessed_data')
 X = pd.read_csv(local_path / 'X.csv', index_col=0)
 y = pd.read_csv(local_path / 'y.csv', index_col=0)
 
@@ -64,6 +62,8 @@ plt.show()
 preds = bst.predict(dtest)
 predictions = [round(value) for value in preds]
 accuracy = accuracy_score(y_test['Hazardous'].to_list(), predictions)
+recall = recall_score(y_test['Hazardous'].to_list(), predictions)
+print(f"Model trained with accuracy: {accuracy} and recall: {recall}")
 # Save the actual accuracy as an artifact so we can get it as part of the pipeline
 task.get_logger().report_scalar(
     title='Accuracy',
