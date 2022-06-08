@@ -1,3 +1,4 @@
+from platform import node
 from clearml import Task
 from clearml.automation import PipelineController
 
@@ -21,19 +22,25 @@ def post_execute_callback_example(a_pipeline, a_node):
 
 def compare_metrics_and_publish_best(**kwargs):
     from clearml import OutputModel
-    # Compare accuracies from all incoming nodes
-    current_best = ('', 0)
+    # Keep track of best node details
+    current_best = dict()
+
+    # For each incoming node, compare against current best
     for node_name, training_task_id in kwargs.items():
-        accuracy = Task.get_task(task_id=training_task_id).get_reported_scalars()['Accuracy']['Accuracy']['y'][0]
-        print(node_name, accuracy)
-        if accuracy > current_best[1]:
-            current_best = (training_task_id, accuracy)
+        # Get the original task based on the ID we got from the pipeline
+        task = Task.get_task(task_id=training_task_id)
+        accuracy = task.get_reported_scalars()['Accuracy']['Accuracy']['y'][0]
+        model_id = task.get_models()['output'][0].id
+        # Check if accuracy is better than current best, if so, overwrite current best
+        if accuracy > current_best.get('accuracy', 0):
+            current_best['accuracy'] = accuracy
+            current_best['node_name'] = node_name
+            current_best['model_id'] = model_id
             print(f"New current best model: {node_name}")
 
-    print(f"Final best model made by step: {current_best[0]}")
-    # # Get the best node and tag it as being best
-    best_task = Task.get_task(task_id=current_best[0])
-    OutputModel(name="best_pipeline_model", base_model_id=best_task.models['output'][0].id)
+    # Print the final best model details and log it as an output model on this step
+    print(f"Final best model: {current_best}")
+    OutputModel(name="best_pipeline_model", base_model_id=current_best.get('model_id'), tags=['pipeline_winner'])
 
 
 # Connecting ClearML with the current pipeline,
@@ -79,7 +86,7 @@ for i, random_state in enumerate(pipe.get_parameters()['training_seeds']):
     )
 
 pipe.add_function_step(
-    name='tag_best_model',
+    name='select_best_model',
     parents=training_nodes,
     function=compare_metrics_and_publish_best,
     function_kwargs={node_name: '${%s.id}' % node_name for node_name in training_nodes},
@@ -92,4 +99,4 @@ pipe.add_function_step(
 # Starting the pipeline (in the background)
 pipe.start()
 
-print('done')
+print('Done!')
