@@ -46,20 +46,20 @@ def compare_metrics_and_publish_best(**kwargs):
 # Connecting ClearML with the current pipeline,
 # from here on everything is logged automatically
 pipe = PipelineController(
-    name='Asteroid Pipeline',
+    name=global_config.PIPELINE_NAME,
     project=global_config.PROJECT_NAME,
     version='0.0.1'
 )
 
-pipe.set_default_execution_queue('default')
+pipe.set_default_execution_queue('CPU Queue')
 pipe.add_parameter('training_seeds', [42, 420, 500])
-pipe.add_parameter('query', 'SELECT * FROM df WHERE year <= 2021')
+pipe.add_parameter('query_date', '2022-01-01')
 
 pipe.add_step(
     name='get_data',
     base_task_project=global_config.PROJECT_NAME,
     base_task_name='get data',
-    parameter_override={'General/query': '${pipeline.query}'}
+    parameter_override={'General/query_date': '${pipeline.query_date}'}
 )
 pipe.add_step(
     name='preprocess_data',

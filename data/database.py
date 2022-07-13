@@ -2,23 +2,24 @@
 from pathlib import Path
 import pandas as pd
 from pandasql import sqldf
+from datetime import datetime, timedelta
 
 
-def query_database_to_df(query='SELECT * FROM df'):
+def query_database_to_df(query='SELECT * FROM asteroids'):
     # Get the data as CSV
     data_path = Path('data/nasa.csv')
     out_path = Path('/tmp/nasa.csv')
 
     # Create a dataframe as mock for the database
-    df = pd.read_csv(data_path)
+    asteroids = pd.read_csv(data_path)
 
     # Add some mock dates
-    df['year'] = 2000 * [2021] + (len(df) - 2000) * [2022]
+    asteroids['date'] = [datetime.now() - i*timedelta(days=1) for i in range(len(asteroids))]
 
     # Query the df base on the argument
-    df = sqldf(query, locals())
+    asteroids = sqldf(query, locals())
 
     # Save resulting DF to disk so it can be added to a clearml dataset as a file
-    df.to_csv(out_path)
+    asteroids.to_csv(out_path)
 
-    return df, out_path
+    return asteroids, out_path

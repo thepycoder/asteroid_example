@@ -12,13 +12,14 @@ task = Task.init(
 )
 
 config = {
-    'query': 'SELECT * FROM df WHERE year <= 2021'
+    'query_date': '2022-01-01'
 }
 task.connect(config)
 
 
 # Get the data and a path to the file
-df, data_path = database.query_database_to_df(query=config['query'])
+query = 'SELECT * FROM asteroids WHERE strftime("%Y-%m-%d", `date`) <= strftime("%Y-%m-%d", "{}")'.format(config['query_date'])
+df, data_path = database.query_database_to_df(query=query)
 print(f"Dataset downloaded to: {data_path}")
 print(df.head())
 
@@ -35,3 +36,4 @@ dataset.get_logger().report_table(title='Asteroid Data', series='head', table_pl
 dataset.finalize(auto_upload=True)
 
 print(f"Created dataset with ID: {dataset.id}")
+print(f"Data size: {len(df)}")
