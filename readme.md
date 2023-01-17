@@ -64,11 +64,18 @@ clearml-serving --id __YOUR_SERVING_ID__  model add --engine xgboost --endpoint 
 ```
 Or change your model name or project depending on if you're using your own or just following along here.
 
-6. Go to `http://localhost:3000/` and login to grafana with the default admin:admin combo, then immediately change it.
+6. Before you can start to monitor the deployed model we need to tell ClearML which metrics it should log. For that also use the CLI:
+```
+clearml-serving --id __YOUR_SERVING_ID__  metrics add --endpoint "asteroid" --variable-scalar "Absolute Magnitude=11.139,18.14,25.12,32.1"
+```
+```
+clearml-serving --id __YOUR_SERVING_ID__  metrics add --endpoint "asteroid" --variable-scalar "Minimum Orbit Intersection=-0.000476,0.159,0.319,0.478"
+```
+7. Go to `http://localhost:3000/` and login to grafana with the default admin:admin combo, then immediately change it.
 Now you can go to dashboards and import the dashboard from this repository called `asteroid.json`
 Feel free to add alerts and change settings as much as you like :)
 
-7. The grafana alert used in the demo (very simple and NOT very good) can be made like this:
+8. The grafana alert used in the demo (very simple and NOT very good) can be made like this:
 ```
 ((100 * increase(asteroid:Minimum_Orbit_Intersection_bucket{}[1m]) / increase(asteroid:Minimum_Orbit_Intersection_sum{}[1m])) - (100 * increase(asteroid:Minimum_Orbit_Intersection_bucket{}[10m]) / increase(asteroid:Minimum_Orbit_Intersection_sum{}[10m]))) ^ 2
 ```
